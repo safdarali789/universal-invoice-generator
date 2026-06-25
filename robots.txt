@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://safdarali789.github.io/universal-invoice-generator/sitemap.xml
