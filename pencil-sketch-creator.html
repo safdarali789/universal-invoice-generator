@@ -6,7 +6,6 @@
 <title>Pencil Sketch Creator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://js.puter.com/v2/"></script>
 <style>
   :root{
     --paper: #F7F5F0;
@@ -318,95 +317,6 @@
   @media (max-width:420px){
     h1{ font-size:1.7rem; }
     .card{ padding:16px; }
-  }  .mode-tabs{
-    display:flex;
-    gap:8px;
-    margin-bottom:20px;
-  }
-
-  .mode-tab{
-    flex:1;
-    text-align:center;
-    padding:12px 8px;
-    background:#fff;
-    border:1.5px solid var(--line);
-    border-radius:3px;
-    cursor:pointer;
-    font-weight:600;
-    font-size:0.9rem;
-    color:var(--pencil);
-    transition:all 0.15s ease;
-  }
-
-  .mode-tab.active{
-    background:var(--graphite);
-    color:var(--paper);
-    border-color:var(--graphite);
-  }
-
-  .mode-section{ display:none; }
-  .mode-section.active{ display:block; }
-
-  .upload-zone{
-    border:2px dashed var(--line);
-    border-radius:4px;
-    padding:28px 16px;
-    text-align:center;
-    cursor:pointer;
-    transition:border-color 0.15s ease, background 0.15s ease;
-    background:var(--paper);
-  }
-
-  .upload-zone:hover, .upload-zone.dragover{
-    border-color:var(--blueline);
-    background:#fff;
-  }
-
-  .upload-zone .upload-icon{
-    font-size:32px;
-    display:block;
-    margin-bottom:8px;
-  }
-
-  .upload-zone p{
-    color:var(--pencil);
-    font-size:0.9rem;
-    margin:4px 0 0;
-  }
-
-  .preview-wrap{
-    text-align:center;
-    margin-top:14px;
-    display:none;
-  }
-
-  .preview-wrap.active{ display:block; }
-
-  .preview-wrap img{
-    max-width:160px;
-    max-height:160px;
-    border-radius:4px;
-    border:1.5px solid var(--line);
-    object-fit:cover;
-  }
-
-  .preview-wrap .remove-photo{
-    display:block;
-    margin:8px auto 0;
-    background:none;
-    border:none;
-    color:var(--eraser-dark);
-    font-size:0.8rem;
-    cursor:pointer;
-    text-decoration:underline;
-  }
-
-  #photoInput{ display:none; }
-
-  .field-note{
-    font-size:0.78rem;
-    color:var(--pencil-light);
-    margin-top:6px;
   }
 
 </style>
@@ -421,32 +331,10 @@
     <p class="subtitle">Describe your idea, and AI will turn it into a pencil sketch</p>
   </header>
 
-  <div class="mode-tabs">
-    <div class="mode-tab active" data-mode="text" onclick="switchMode('text')">✏️ Create from Text</div>
-    <div class="mode-tab" data-mode="photo" onclick="switchMode('photo')">📷 Create from Photo</div>
-  </div>
-
   <div class="card">
 
-    <div class="mode-section active" id="textMode">
-      <label for="prompt">What would you like to create?</label>
-      <textarea id="prompt" placeholder="e.g. An old man drinking tea, a village house near the mountains..."></textarea>
-    </div>
-
-    <div class="mode-section" id="photoMode">
-      <label>Upload your photo</label>
-      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('photoInput').click()">
-        <span class="upload-icon">📷</span>
-        <p>Tap here to select a photo</p>
-      </div>
-      <input type="file" id="photoInput" accept="image/*">
-      <div class="preview-wrap" id="previewWrap">
-        <img id="previewImg" src="" alt="Preview">
-        <button class="remove-photo" onclick="removePhoto()">Remove photo</button>
-      </div>
-      <p class="field-note">After uploading, describe any change you'd like (or leave blank for a standard sketch)</p>
-      <textarea id="photoPrompt" style="margin-top:10px;" placeholder="e.g. Turn this photo into a pencil sketch (you can also leave this blank)"></textarea>
-    </div>
+    <label for="prompt">What would you like to create?</label>
+    <textarea id="prompt" placeholder="e.g. An old man drinking tea, a village house near the mountains..."></textarea>
 
     <label style="margin-top:16px;">Sketch Style</label>
     <div class="style-chips" id="styleChips">
@@ -488,9 +376,6 @@
 
 <script>
 let history = [];
-let currentMode = 'text';
-let uploadedPhotoBase64 = null;
-let uploadedPhotoMime = null;
 
 document.querySelectorAll('.chip').forEach(chip => {
   chip.addEventListener('click', () => {
@@ -498,63 +383,6 @@ document.querySelectorAll('.chip').forEach(chip => {
     chip.classList.add('active');
   });
 });
-
-function switchMode(mode){
-  currentMode = mode;
-  document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
-  document.getElementById('textMode').classList.toggle('active', mode === 'text');
-  document.getElementById('photoMode').classList.toggle('active', mode === 'photo');
-  document.getElementById('sizeRow').style.display = mode === 'text' ? 'flex' : 'none';
-  setStatus('');
-}
-
-const photoInput = document.getElementById('photoInput');
-const uploadZone = document.getElementById('uploadZone');
-
-photoInput.addEventListener('change', function(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  handlePhotoFile(file);
-});
-
-uploadZone.addEventListener('dragover', function(e){
-  e.preventDefault();
-  uploadZone.classList.add('dragover');
-});
-uploadZone.addEventListener('dragleave', function(){
-  uploadZone.classList.remove('dragover');
-});
-uploadZone.addEventListener('drop', function(e){
-  e.preventDefault();
-  uploadZone.classList.remove('dragover');
-  const file = e.dataTransfer.files[0];
-  if(file) handlePhotoFile(file);
-});
-
-function handlePhotoFile(file){
-  if(!file.type.startsWith('image/')){
-    setStatus('Please select an image file only.', true);
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = function(e){
-    const dataUrl = e.target.result;
-    uploadedPhotoMime = file.type;
-    uploadedPhotoBase64 = dataUrl.split(',')[1];
-    document.getElementById('previewImg').src = dataUrl;
-    document.getElementById('previewWrap').classList.add('active');
-    uploadZone.style.display = 'none';
-  };
-  reader.readAsDataURL(file);
-}
-
-function removePhoto(){
-  uploadedPhotoBase64 = null;
-  uploadedPhotoMime = null;
-  document.getElementById('previewWrap').classList.remove('active');
-  uploadZone.style.display = 'block';
-  photoInput.value = '';
-}
 
 function getActiveStyle(){
   const active = document.querySelector('.chip.active');
@@ -573,14 +401,6 @@ function buildPrompt(userText){
 }
 
 async function generateSketch(){
-  if(currentMode === 'text'){
-    await generateFromText();
-  } else {
-    await generateFromPhoto();
-  }
-}
-
-async function generateFromText(){
   const promptInput = document.getElementById('prompt').value.trim();
   if(!promptInput){
     setStatus('Please describe what you would like to create first.', true);
@@ -590,74 +410,40 @@ async function generateFromText(){
   const btn = document.getElementById('genBtn');
   btn.disabled = true;
   btn.textContent = 'Generating...';
-  setStatus('<span class="loading-dots"><span></span><span></span><span></span></span> Creating your sketch, please wait...');
+  setStatus('<span class="loading-dots"><span></span><span></span><span></span></span> Creating your sketch, this can take up to 30 seconds...');
   document.getElementById('resultArea').innerHTML = '';
 
   const fullPrompt = buildPrompt(promptInput);
   const size = document.getElementById('size').value;
+  const [w, h] = size.split('x');
   const seed = Math.floor(Math.random() * 1000000);
   const encodedPrompt = encodeURIComponent(fullPrompt);
-  const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${size.split('x')[0]}&height=${size.split('x')[1]}&seed=${seed}&nologo=true`;
+  const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${w}&height=${h}&seed=${seed}&model=flux`;
 
   const img = new Image();
+  let settled = false;
 
-  img.onload = function(){
-    setStatus('');
+  const finish = (success) => {
+    if(settled) return;
+    settled = true;
+    clearTimeout(timeoutId);
     btn.disabled = false;
     btn.textContent = 'Generate Sketch';
 
-    showResult(imageUrl, promptInput);
-    addToHistory(imageUrl, promptInput);
+    if(success){
+      setStatus('');
+      showResult(imageUrl, promptInput);
+      addToHistory(imageUrl, promptInput);
+    } else {
+      setStatus('Sorry, the sketch did not load in time. The server may be busy — please try again.', true);
+    }
   };
 
-  img.onerror = function(){
-    setStatus('Sorry, there was a problem creating the sketch. Please try again or check your internet connection.', true);
-    btn.disabled = false;
-    btn.textContent = 'Generate Sketch';
-  };
+  const timeoutId = setTimeout(() => finish(false), 45000);
 
+  img.onload = function(){ finish(true); };
+  img.onerror = function(){ finish(false); };
   img.src = imageUrl;
-}
-
-async function generateFromPhoto(){
-  if(!uploadedPhotoBase64){
-    setStatus('Please upload a photo first.', true);
-    return;
-  }
-
-  const userNote = document.getElementById('photoPrompt').value.trim();
-  const style = getActiveStyle();
-  const instruction = userNote
-    ? `${userNote}, convert this photo into a ${style}, fine line detail, high contrast, white paper background`
-    : `Convert this photo into a ${style}, fine line detail, high contrast, white paper background, keep the same subject and composition`;
-
-  const btn = document.getElementById('genBtn');
-  btn.disabled = true;
-  btn.textContent = 'Generating...';
-  setStatus('<span class="loading-dots"><span></span><span></span><span></span></span> Creating a sketch from your photo, please wait...');
-  document.getElementById('resultArea').innerHTML = '';
-
-  try{
-    const image = await puter.ai.txt2img(instruction, {
-      model: "gemini-2.5-flash-image-preview",
-      input_image: uploadedPhotoBase64,
-      input_image_mime_type: uploadedPhotoMime
-    });
-
-    setStatus('');
-    btn.disabled = false;
-    btn.textContent = 'Generate Sketch';
-
-    const imageUrl = image.src;
-    showResult(imageUrl, userNote || 'Photo Sketch');
-    addToHistory(imageUrl, userNote || 'Photo Sketch');
-
-  } catch(err){
-    console.error(err);
-    setStatus('Sorry, there was a problem creating the sketch from your photo. Please try again.', true);
-    btn.disabled = false;
-    btn.textContent = 'Generate Sketch';
-  }
 }
 
 function showResult(imageUrl, captionText){
@@ -690,15 +476,6 @@ function renderHistory(){
 }
 
 function downloadImage(url){
-  if(url.startsWith('data:')){
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'pencil-sketch-' + Date.now() + '.png';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    return;
-  }
   fetch(url)
     .then(res => res.blob())
     .then(blob => {
