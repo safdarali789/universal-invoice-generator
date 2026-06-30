@@ -29,3 +29,1206 @@
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice Generator — Universal Invoice Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1B2A41;
+  --paper:#FAFAF7;
+  --slate:#5B6B7C;
+  --accent:#C1432E;
+  --hairline:#D8D4CB;
+  --success:#3D7A5C;
+  --panel:#EFEDE6;
+  --panel-deep:#21314A;
+  --white:#FFFFFF;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--panel-deep);
+  color:var(--ink);
+  min-height:100vh;
+}
+::selection{background:var(--accent);color:white;}
+
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:'Inter',sans-serif;}
+
+.app{
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
+
+.panel{
+  background:var(--panel-deep);
+  color:#E7E9EC;
+  padding:28px 22px 30px;
+  position:relative;
+}
+.panel::-webkit-scrollbar{width:8px;}
+.panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:4px;}
+
+.brand{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  margin-bottom:4px;
+}
+.brand .mark{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  letter-spacing:0.12em;
+  color:var(--accent);
+  border:1px solid var(--accent);
+  padding:2px 7px;
+  border-radius:3px;
+}
+.brand h1{
+  font-family:'Source Serif 4',serif;
+  font-size:22px;
+  font-weight:600;
+  margin:0;
+  color:#fff;
+}
+
+.readme-toggle-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.14);
+  border-radius:8px;
+  padding:10px 12px;
+  margin:14px 0 4px;
+}
+.readme-toggle-row span{
+  font-size:13px;
+  color:#D7DEE5;
+}
+.readme-panel{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.14);
+  border-radius:8px;
+  padding:16px 16px 4px;
+  margin-bottom:18px;
+  font-size:12.5px;
+  line-height:1.85;
+  color:#C7D0DA;
+  display:none;
+}
+.readme-panel.open{display:block;}
+.readme-panel h3{
+  font-family:'Source Serif 4',serif;
+  font-size:14.5px;
+  color:#fff;
+  margin:14px 0 6px;
+}
+.readme-panel h3:first-child{margin-top:0;}
+.readme-panel ul{margin:0 0 10px;padding-right:18px;}
+[dir="ltr"] .readme-panel ul{padding-right:0;padding-left:18px;}
+.readme-panel li{margin-bottom:5px;}
+.readme-panel code{
+  background:rgba(255,255,255,0.1);
+  padding:1px 6px;
+  border-radius:4px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11.5px;
+  color:#FFD9CC;
+}
+.readme-panel table{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:11.5px;}
+.readme-panel th,.readme-panel td{
+  border:1px solid rgba(255,255,255,0.14);
+  padding:6px 8px;
+  text-align:right;
+}
+[dir="ltr"] .readme-panel th,[dir="ltr"] .readme-panel td{text-align:left;}
+.readme-panel th{color:#fff;background:rgba(255,255,255,0.06);}
+.panel .sub{
+  font-size:12.5px;
+  color:#9BA8B8;
+  margin:6px 0 26px;
+  line-height:1.6;
+}
+
+.field-group{
+  margin-bottom:22px;
+  padding-bottom:20px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.field-group:last-of-type{border-bottom:none;}
+.fg-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:#7E8FA3;
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.fg-label::after{
+  content:'';
+  flex:1;
+  height:1px;
+  background:rgba(255,255,255,0.1);
+}
+
+label.field{
+  display:block;
+  margin-bottom:12px;
+}
+label.field span{
+  display:block;
+  font-size:12px;
+  color:#AEB9C4;
+  margin-bottom:5px;
+}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+input[type=text],input[type=number],input[type=date],input[type=email],select,textarea{
+  width:100%;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.14);
+  color:#fff;
+  padding:9px 10px;
+  border-radius:6px;
+  font-size:13.5px;
+  outline:none;
+  transition:border-color .15s, background .15s;
+}
+input::placeholder,textarea::placeholder{color:#6E7B8A;}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--accent);
+  background:rgba(255,255,255,0.09);
+}
+textarea{resize:vertical;min-height:54px;line-height:1.5;}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239BA8B8'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 12px center;padding-left:28px;}
+[dir="rtl"] select{background-position:right 12px center;padding-right:28px;padding-left:10px;}
+
+.template-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.tpl-btn{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.12);
+  color:#C7D0DA;
+  padding:10px 8px;
+  border-radius:7px;
+  font-size:12px;
+  text-align:center;
+  line-height:1.4;
+}
+.tpl-btn.active{
+  border-color:var(--accent);
+  background:rgba(193,67,46,0.18);
+  color:#fff;
+}
+
+.lang-toggle{
+  display:flex;
+  gap:6px;
+}
+.lang-toggle button{
+  flex:1;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.12);
+  color:#C7D0DA;
+  padding:8px 4px;
+  border-radius:6px;
+  font-size:12.5px;
+}
+.lang-toggle button.active{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:#fff;
+}
+
+.items-list{display:flex;flex-direction:column;gap:10px;}
+.item-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px;
+  padding:12px;
+  position:relative;
+}
+.item-card .item-top{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  margin-bottom:8px;
+}
+.item-card .item-nums{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+}
+.item-card .item-nums label span{font-size:10.5px;}
+.remove-item{
+  position:absolute;
+  top:8px;
+  left:8px;
+  background:none;
+  border:none;
+  color:#8A97A6;
+  font-size:16px;
+  line-height:1;
+  padding:2px 6px;
+}
+[dir="rtl"] .remove-item{left:auto;right:8px;}
+.remove-item:hover{color:var(--accent);}
+
+.add-item-btn{
+  width:100%;
+  background:transparent;
+  border:1.5px dashed rgba(255,255,255,0.25);
+  color:#AEB9C4;
+  padding:10px;
+  border-radius:7px;
+  font-size:13px;
+  margin-top:10px;
+}
+.add-item-btn:hover{border-color:var(--accent);color:#fff;}
+
+.toggle-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;justify-content:space-between;
+  margin-bottom:12px;
+}
+.toggle-row span{font-size:13px;color:#D7DEE5;}
+.switch{
+  width:38px;height:21px;
+  background:rgba(255,255,255,0.15);
+  border-radius:12px;
+  position:relative;
+  border:none;
+  flex-shrink:0;
+}
+.switch::after{
+  content:'';
+  width:15px;height:15px;
+  background:#fff;
+  border-radius:50%;
+  position:absolute;
+  top:3px;left:3px;
+  transition:transform .18s;
+}
+.switch.on{background:var(--accent);}
+.switch.on::after{transform:translateX(17px);}
+[dir="rtl"] .switch.on::after{transform:translateX(-17px);}
+
+.tax-row{display:grid;grid-template-columns:1fr 90px;gap:8px;align-items:end;}
+
+.action-bar{
+  margin:24px 0 0;
+  padding:18px 0 4px;
+  border-top:1px solid rgba(255,255,255,0.1);
+}
+.btn-primary{
+  width:100%;
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  padding:14px;
+  border-radius:8px;
+  font-size:14.5px;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  box-shadow:0 8px 24px rgba(193,67,46,0.35);
+}
+.btn-primary:hover{background:#A8392A;}
+.btn-secondary{
+  width:100%;
+  background:transparent;
+  color:#C7D0DA;
+  border:1px solid rgba(255,255,255,0.18);
+  padding:11px;
+  border-radius:8px;
+  font-size:13px;
+  margin-top:8px;
+}
+.btn-secondary:hover{border-color:#fff;color:#fff;}
+
+.preview-wrap{
+  background:var(--panel-deep);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:24px 16px 60px;
+  overflow-x:auto;
+}
+.preview-toolbar{
+  width:100%;
+  max-width:780px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+.preview-toolbar .zoom-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:#8A97A6;
+  letter-spacing:0.08em;
+}
+.scale-btns{display:flex;gap:6px;}
+.scale-btns button{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.14);
+  color:#C7D0DA;
+  width:30px;height:30px;
+  border-radius:6px;
+  font-size:15px;
+}
+
+#invoice-sheet{
+  width:780px;
+  min-height:1040px;
+  background:var(--paper);
+  box-shadow:0 30px 60px -10px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.05);
+  position:relative;
+  padding:56px 58px 64px;
+  font-family:'Inter',sans-serif;
+  color:var(--ink);
+}
+#invoice-sheet.lang-ur{
+  direction:rtl;
+  font-family:'Noto Nastaliq Urdu','Inter',sans-serif;
+}
+#invoice-sheet.lang-ar{
+  direction:rtl;
+  font-family:'Noto Nastaliq Urdu','Inter',sans-serif;
+}
+
+.doc-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  padding-bottom:28px;
+  border-bottom:2px solid var(--ink);
+  margin-bottom:28px;
+}
+.issuer-block .logo-fallback{
+  width:46px;height:46px;
+  background:var(--ink);
+  color:var(--paper);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Source Serif 4',serif;
+  font-size:19px;
+  font-weight:700;
+  border-radius:4px;
+  margin-bottom:10px;
+}
+.issuer-block .issuer-name{
+  font-family:'Source Serif 4',serif;
+  font-size:20px;
+  font-weight:700;
+  margin:0 0 4px;
+}
+.issuer-block .issuer-meta{
+  font-size:12.5px;
+  color:var(--slate);
+  line-height:1.6;
+  white-space:pre-line;
+  max-width:280px;
+}
+.doc-title-block{text-align:left;}
+[dir="rtl"] .doc-title-block{text-align:right;}
+.doc-title-block .doc-type{
+  font-family:'Source Serif 4',serif;
+  font-size:32px;
+  font-weight:700;
+  letter-spacing:0.01em;
+  color:var(--ink);
+  margin:0 0 6px;
+}
+.doc-title-block .doc-number{
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  color:var(--accent);
+  font-weight:600;
+}
+.doc-title-block .doc-dates{
+  margin-top:10px;
+  font-size:12px;
+  color:var(--slate);
+  line-height:1.7;
+}
+.doc-title-block .doc-dates b{color:var(--ink);font-weight:600;}
+
+.status-seal{
+  position:absolute;
+  top:140px;
+  left:62px;
+  border:3px solid var(--success);
+  color:var(--success);
+  font-family:'Source Serif 4',serif;
+  font-weight:700;
+  font-size:26px;
+  letter-spacing:0.12em;
+  padding:6px 18px;
+  border-radius:6px;
+  transform:rotate(-9deg);
+  opacity:0.85;
+  text-transform:uppercase;
+}
+[dir="rtl"] .status-seal{left:auto;right:62px;}
+.status-seal.due{border-color:var(--accent);color:var(--accent);}
+
+.parties{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+  margin-bottom:30px;
+}
+.party .p-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--slate);
+  margin-bottom:7px;
+}
+.party .p-name{font-size:14.5px;font-weight:600;margin-bottom:3px;}
+.party .p-meta{font-size:12.5px;color:var(--slate);line-height:1.65;white-space:pre-line;}
+
+table.items{
+  width:100%;
+  border-collapse:collapse;
+  margin-bottom:6px;
+}
+table.items thead th{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--slate);
+  text-align:left;
+  padding:0 8px 10px;
+  border-bottom:1.5px solid var(--ink);
+}
+[dir="rtl"] table.items thead th{text-align:right;}
+table.items thead th.num,table.items tbody td.num{text-align:right;}
+[dir="rtl"] table.items thead th.num,[dir="rtl"] table.items tbody td.num{text-align:left;}
+table.items tbody td{
+  padding:13px 8px;
+  font-size:13px;
+  border-bottom:1px solid var(--hairline);
+  vertical-align:top;
+}
+table.items tbody td.num,table.items tbody td.amt{
+  font-family:'JetBrains Mono',monospace;
+  font-variant-numeric:tabular-nums;
+  font-size:12.5px;
+}
+table.items tbody tr:last-child td{border-bottom:1.5px solid var(--ink);}
+table.items tbody td.desc-cell .item-title{font-weight:600;color:var(--ink);}
+table.items tbody td.desc-cell .item-sub{color:var(--slate);font-size:11.5px;margin-top:2px;}
+
+.totals-wrap{
+  display:flex;
+  justify-content:flex-end;
+  margin-top:14px;
+}
+[dir="rtl"] .totals-wrap{justify-content:flex-start;}
+.totals-box{width:280px;}
+.totals-box .t-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  padding:7px 0;
+  color:var(--slate);
+}
+.totals-box .t-row b{
+  color:var(--ink);
+  font-family:'JetBrains Mono',monospace;
+  font-variant-numeric:tabular-nums;
+  font-weight:500;
+}
+.totals-box .t-grand{
+  display:flex;
+  justify-content:space-between;
+  padding:14px 0 0;
+  margin-top:8px;
+  border-top:2px solid var(--ink);
+  font-family:'Source Serif 4',serif;
+  font-size:19px;
+  font-weight:700;
+  color:var(--ink);
+}
+.totals-box .t-grand .amt{
+  font-family:'JetBrains Mono',monospace;
+  font-variant-numeric:tabular-nums;
+}
+
+.notes-section{
+  margin-top:36px;
+  padding-top:20px;
+  border-top:1px solid var(--hairline);
+  display:grid;
+  grid-template-columns:1.3fr 1fr;
+  gap:24px;
+}
+.notes-section .n-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--slate);
+  margin-bottom:6px;
+}
+.notes-section .n-body{font-size:12px;color:var(--ink);line-height:1.7;white-space:pre-line;}
+.notes-section .bank-grid{font-size:12px;line-height:1.9;color:var(--ink);}
+.notes-section .bank-grid div{display:flex;justify-content:space-between;gap:10px;}
+.notes-section .bank-grid span:first-child{color:var(--slate);}
+
+.doc-footer{
+  margin-top:40px;
+  padding-top:16px;
+  border-top:1px solid var(--hairline);
+  font-size:11px;
+  color:var(--slate);
+  text-align:center;
+}
+
+@media print{
+  body{background:#fff;}
+  .app{grid-template-columns:1fr;}
+  .panel,.preview-toolbar{display:none !important;}
+  .preview-wrap{padding:0;background:#fff;align-items:flex-start;}
+  #invoice-sheet{box-shadow:none;width:100%;}
+}
+
+@media (max-width: 560px){
+  .row2,.row3,.item-card .item-nums{grid-template-columns:1fr 1fr;}
+  .doc-head{flex-direction:column;gap:18px;}
+  .doc-title-block{text-align:right;}
+  [dir="rtl"] .doc-title-block{text-align:left;}
+  .parties{grid-template-columns:1fr;gap:18px;}
+  .notes-section{grid-template-columns:1fr;gap:18px;}
+  .status-seal{top:auto;bottom:20px;}
+}
+@media (max-width: 480px){
+  .template-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body><div class="app">
+  <!-- ===================== CONTROL PANEL ===================== -->
+  <div class="panel">
+    <div class="brand">
+      <h1>Invoice Generator</h1>
+      <span class="mark">UNIVERSAL</span>
+    </div>
+    <p class="sub">Create invoices in any style or country format used around the world — GST, VAT, standard billing, or proforma.</p>
+
+    <div class="readme-toggle-row">
+      <span>📖 Show Instructions / Readme</span>
+      <button class="switch" id="readmeToggle"></button>
+    </div>
+    <div class="readme-panel" id="readmePanel">
+      <h3>What this tool does</h3>
+      <ul>
+        <li>6 invoice templates: Standard, GST/Tax, VAT, Proforma, Freelancer, Receipt</li>
+        <li>3 languages: Urdu, English, Arabic (with RTL support)</li>
+        <li>15+ currencies with automatic tax/discount calculation</li>
+        <li>PAID/DUE stamp and bank details section</li>
+        <li>Print or save as PDF</li>
+      </ul>
+      <h3>How to use it</h3>
+      <ul>
+        <li>Choose a template above and pick a language</li>
+        <li>Fill in your company and client details</li>
+        <li>Use "+ Add New Item" to add line items one by one</li>
+        <li>The preview updates automatically as you type</li>
+      </ul>
+      <h3>On/Off toggle switches</h3>
+      <table>
+        <tr><th>Switch</th><th>When ON</th><th>When OFF</th></tr>
+        <tr><td>Tax</td><td>Tax line is added</td><td>Tax line is removed</td></tr>
+        <tr><td>Discount</td><td>Discount line is added</td><td>Discount line is removed</td></tr>
+      </table>
+    </div>
+
+    <!-- Template / region -->
+    <div class="field-group">
+      <div class="fg-label">Choose a Template</div>
+      <div class="template-grid" id="template-grid"></div>
+    </div>
+
+    <!-- Document language -->
+    <div class="field-group">
+      <div class="fg-label">Invoice Language</div>
+      <div class="lang-toggle" id="lang-toggle">
+        <button data-lang="ur">اردو</button>
+        <button data-lang="en" class="active">English</button>
+        <button data-lang="ar">العربية</button>
+      </div>
+    </div>
+
+    <!-- Doc meta -->
+    <div class="field-group">
+      <div class="fg-label">Document Details</div>
+      <div class="row2">
+        <label class="field"><span>Document Type</span>
+          <select id="docType">
+            <option value="انوائس">Invoice</option>
+            <option value="پروفارما انوائس">Proforma Invoice</option>
+            <option value="ٹیکس انوائس">Tax Invoice</option>
+            <option value="کریڈٹ نوٹ">Credit Note</option>
+            <option value="رسید">Receipt</option>
+            <option value="کوٹیشن">Quotation</option>
+          </select>
+        </label>
+        <label class="field"><span>Number</span>
+          <input type="text" id="docNumber" value="INV-2026-0001">
+        </label>
+      </div>
+      <div class="row2">
+        <label class="field"><span>Issue Date</span>
+          <input type="date" id="issueDate">
+        </label>
+        <label class="field"><span>Due Date</span>
+          <input type="date" id="dueDate">
+        </label>
+      </div>
+      <label class="field"><span>Status</span>
+        <select id="docStatus">
+          <option value="none">None</option>
+          <option value="paid">Paid</option>
+          <option value="due" selected>Due</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- Currency / locale -->
+    <div class="field-group">
+      <div class="fg-label">Currency & Format</div>
+      <div class="row2">
+        <label class="field"><span>Currency</span>
+          <select id="currency">
+            <option value="₨" data-code="PKR">₨ — PKR (Pakistan)</option>
+            <option value="$" data-code="USD" selected>$ — USD</option>
+            <option value="€" data-code="EUR">€ — EUR</option>
+            <option value="£" data-code="GBP">£ — GBP</option>
+            <option value="₹" data-code="INR">₹ — INR (India)</option>
+            <option value="AED" data-code="AED">AED — UAE</option>
+            <option value="SAR" data-code="SAR">SAR — Saudi Arabia</option>
+            <option value="¥" data-code="JPY">¥ — JPY</option>
+            <option value="¥" data-code="CNY">¥ — CNY</option>
+            <option value="₩" data-code="KRW">₩ — KRW</option>
+            <option value="A$" data-code="AUD">A$ — AUD</option>
+            <option value="C$" data-code="CAD">C$ — CAD</option>
+            <option value="R$" data-code="BRL">R$ — BRL</option>
+            <option value="₦" data-code="NGN">₦ — NGN</option>
+            <option value="₽" data-code="RUB">₽ — RUB</option>
+            <option value="₺" data-code="TRY">₺ — TRY</option>
+          </select>
+        </label>
+        <label class="field"><span>Symbol Position</span>
+          <select id="symbolPos">
+            <option value="before">Before ($100)</option>
+            <option value="after">After (100 ₨)</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <!-- Issuer -->
+    <div class="field-group">
+      <div class="fg-label">Your Company (Sender)</div>
+      <label class="field"><span>Company / Name</span>
+        <input type="text" id="issuerName" placeholder="e.g. Crescent Traders" value="Crescent Traders">
+      </label>
+      <label class="field"><span>Address, Phone, Email (each on a new line)</span>
+        <textarea id="issuerMeta" placeholder="Address&#10;Phone&#10;Email">Gulberg III, Lahore, Pakistan&#10;+92 300 1234567&#10;[email protected]</textarea>
+      </label>
+      <label class="field"><span>Tax / Registration Number (optional)</span>
+        <input type="text" id="issuerTax" placeholder="e.g. NTN / GSTIN / VAT No.">
+      </label>
+    </div>
+
+    <!-- Client -->
+    <div class="field-group">
+      <div class="fg-label">Client (Recipient)</div>
+      <label class="field"><span>Client Name</span>
+        <input type="text" id="clientName" placeholder="e.g. Ahmed Enterprises" value="Ahmed Enterprises">
+      </label>
+      <label class="field"><span>Address, Phone, Email</span>
+        <textarea id="clientMeta" placeholder="Address&#10;Phone&#10;Email">Model Town, Lahore, Pakistan&#10;+92 321 7654321</textarea>
+      </label>
+    </div>
+
+    <!-- Line items -->
+    <div class="field-group">
+      <div class="fg-label">Items / Services</div>
+      <div class="items-list" id="items-list"></div>
+      <button class="add-item-btn" id="addItemBtn">+ Add New Item</button>
+    </div>
+
+    <!-- Tax & discount -->
+    <div class="field-group">
+      <div class="fg-label">Tax & Discount</div>
+      <div class="toggle-row">
+        <span>Add Tax (GST/VAT/Sales Tax)</span>
+        <button class="switch on" id="taxToggle"></button>
+      </div>
+      <div class="tax-row" id="taxRow">
+        <label class="field" style="margin-bottom:0"><span>Tax Label</span>
+          <input type="text" id="taxLabel" value="GST">
+        </label>
+        <label class="field" style="margin-bottom:0"><span>Percent %</span>
+          <input type="number" id="taxPercent" value="17">
+        </label>
+      </div>
+      <div class="toggle-row" style="margin-top:14px;">
+        <span>Add Discount</span>
+        <button class="switch" id="discountToggle"></button>
+      </div>
+      <div class="tax-row" id="discountRow" style="display:none;">
+        <label class="field" style="margin-bottom:0"><span>Discount Label</span>
+          <input type="text" id="discountLabel" value="Discount">
+        </label>
+        <label class="field" style="margin-bottom:0"><span>Percent %</span>
+          <input type="number" id="discountPercent" value="0">
+        </label>
+      </div>
+      <label class="field" style="margin-top:10px;"><span>Shipping / Other Charges (amount)</span>
+        <input type="number" id="shippingAmt" value="0">
+      </label>
+    </div>
+
+    <!-- Bank / payment -->
+    <div class="field-group">
+      <div class="fg-label">Payment Details</div>
+      <label class="field"><span>Bank Name</span>
+        <input type="text" id="bankName" placeholder="e.g. HBL Bank">
+      </label>
+      <label class="field"><span>Account Number / IBAN</span>
+        <input type="text" id="bankAcc" placeholder="PK00 XXXX 0000 0000 0000">
+      </label>
+      <label class="field"><span>Notes / Terms</span>
+        <textarea id="notes" placeholder="Payment terms, thank-you message, etc.">Payment is due within 15 days. Thank you for your business.</textarea>
+      </label>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn-primary" id="printBtn">⬇ Print / Save as PDF</button>
+      <button class="btn-secondary" id="resetBtn">Clear and Start Over</button>
+    </div>
+  </div>
+
+  <!-- ===================== PREVIEW ===================== -->
+  <div class="preview-wrap">
+    <div class="preview-toolbar">
+      <span class="zoom-label" id="zoomLabel">LIVE PREVIEW</span>
+      <div class="scale-btns">
+        <button id="zoomOut">−</button>
+        <button id="zoomIn">+</button>
+      </div>
+    </div>
+
+    <div id="sheet-scaler" style="transform-origin:top center;">
+      <div id="invoice-sheet" class="lang-en">
+        <div class="status-seal due" id="statusSeal" style="display:none;">DUE</div>
+
+        <div class="doc-head">
+          <div class="issuer-block">
+            <div class="logo-fallback" id="logoFallback">C</div>
+            <p class="issuer-name" id="out-issuerName">Crescent Traders</p>
+            <div class="issuer-meta" id="out-issuerMeta"></div>
+            <div class="issuer-meta" id="out-issuerTax" style="margin-top:4px;"></div>
+          </div>
+          <div class="doc-title-block">
+            <p class="doc-type" id="out-docType">INVOICE</p>
+            <p class="doc-number" id="out-docNumber">INV-2026-0001</p>
+            <div class="doc-dates">
+              <div><b id="lbl-issue">Issue Date:</b> <span id="out-issueDate">—</span></div>
+              <div><b id="lbl-due">Due Date:</b> <span id="out-dueDate">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="parties">
+          <div class="party">
+            <div class="p-label" id="lbl-billto">Bill To</div>
+            <p class="p-name" id="out-clientName">Ahmed Enterprises</p>
+            <div class="p-meta" id="out-clientMeta"></div>
+          </div>
+          <div class="party">
+            <div class="p-label" id="lbl-from">From</div>
+            <p class="p-name" id="out-issuerName2">Crescent Traders</p>
+            <div class="p-meta" id="out-issuerMeta2"></div>
+          </div>
+        </div>
+
+        <table class="items">
+          <thead>
+            <tr>
+              <th id="th-desc">Description</th>
+              <th class="num" id="th-qty">Qty</th>
+              <th class="num" id="th-rate">Unit Price</th>
+              <th class="num" id="th-amt">Amount</th>
+            </tr>
+          </thead>
+          <tbody id="out-items"></tbody>
+        </table>
+
+        <div class="totals-wrap">
+          <div class="totals-box" id="out-totals"></div>
+        </div>
+
+        <div class="notes-section">
+          <div>
+            <div class="n-label" id="lbl-notes">Notes & Terms</div>
+            <div class="n-body" id="out-notes"></div>
+          </div>
+          <div id="bankBlock">
+            <div class="n-label" id="lbl-payment">Payment Details</div>
+            <div class="bank-grid" id="out-bank"></div>
+          </div>
+        </div>
+
+        <div class="doc-footer" id="out-footer">Thank you for your business!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>/* ============== STATE ============== */
+let items = [
+  {desc:'Website Design and Development', sub:'', qty:1, rate:1500},
+  {desc:'Monthly Maintenance', sub:'June 2026', qty:1, rate:200},
+];
+let lang = 'en';
+let taxOn = true, discountOn = false;
+let scale = 1;
+
+const templates = [
+  {id:'standard', label:'Standard\nInvoice'},
+  {id:'gst', label:'GST / Tax Invoice'},
+  {id:'vat', label:'VAT (Europe/Gulf)'},
+  {id:'proforma', label:'Proforma'},
+  {id:'freelance', label:'Freelancer'},
+  {id:'receipt', label:'Receipt'},
+];
+let activeTemplate = 'standard';
+
+const i18n = {
+  ur: { invoice:'انوائس', billto:'بل بھیجا گیا', from:'بھیجنے والا', issue:'تاریخ اجراء:', due:'آخری تاریخ:',
+    desc:'تفصیل', qty:'مقدار', rate:'قیمت فی یونٹ', amt:'مجموعی رقم', subtotal:'ذیلی مجموعہ', total:'کل رقم',
+    notes:'نوٹس اور شرائط', payment:'ادائیگی کی تفصیلات', bank:'بینک', account:'اکاؤنٹ', footer:'شکریہ! آپ کے کاروبار کے لیے ممنون ہیں۔' },
+  en: { invoice:'INVOICE', billto:'Bill To', from:'From', issue:'Issue Date:', due:'Due Date:',
+    desc:'Description', qty:'Qty', rate:'Unit Price', amt:'Amount', subtotal:'Subtotal', total:'Total Due',
+    notes:'Notes & Terms', payment:'Payment Details', bank:'Bank', account:'Account', footer:'Thank you for your business!' },
+  ar: { invoice:'فاتورة', billto:'إلى', from:'من', issue:'تاريخ الإصدار:', due:'تاريخ الاستحقاق:',
+    desc:'الوصف', qty:'الكمية', rate:'سعر الوحدة', amt:'المبلغ', subtotal:'المجموع الفرعي', total:'الإجمالي المستحق',
+    notes:'ملاحظات وشروط', payment:'تفاصيل الدفع', bank:'البنك', account:'الحساب', footer:'شكراً لتعاملكم معنا!' },
+};
+
+/* ============== DOM refs ============== */
+const $ = id => document.getElementById(id);
+
+/* ============== Render template buttons ============== */
+function renderTemplateGrid(){
+  const grid = $('template-grid');
+  grid.innerHTML = '';
+  templates.forEach(t=>{
+    const b = document.createElement('button');
+    b.className = 'tpl-btn' + (t.id===activeTemplate ? ' active':'');
+    b.style.whiteSpace = 'pre-line';
+    b.textContent = t.label;
+    b.onclick = ()=>{ applyTemplate(t.id); };
+    grid.appendChild(b);
+  });
+}
+
+function applyTemplate(id){
+  activeTemplate = id;
+  renderTemplateGrid();
+  const docTypeSel = $('docType');
+  if(id==='gst'){ docTypeSel.value='ٹیکس انوائس'; taxOn=true; $('taxLabel').value='GST'; $('taxPercent').value='17'; }
+  if(id==='vat'){ docTypeSel.value='ٹیکس انوائس'; taxOn=true; $('taxLabel').value='VAT'; $('taxPercent').value='15'; }
+  if(id==='proforma'){ docTypeSel.value='پروفارما انوائس'; }
+  if(id==='standard'){ docTypeSel.value='انوائس'; }
+  if(id==='freelance'){ docTypeSel.value='انوائس'; taxOn=false; }
+  if(id==='receipt'){ docTypeSel.value='رسید'; $('docStatus').value='paid'; }
+  syncTaxSwitch();
+  render();
+}
+
+function syncTaxSwitch(){
+  $('taxToggle').classList.toggle('on', taxOn);
+  $('taxRow').style.display = taxOn ? 'grid' : 'none';
+}
+
+/* ============== Line items UI ============== */
+function renderItemsUI(){
+  const list = $('items-list');
+  list.innerHTML = '';
+  items.forEach((it, idx)=>{
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.innerHTML = `
+      <button class="remove-item" data-idx="${idx}">×</button>
+      <div class="item-top">
+        <label class="field" style="margin-bottom:6px;"><span>Description</span>
+          <input type="text" class="it-desc" data-idx="${idx}" value="${escapeHtml(it.desc)}" placeholder="Item name">
+        </label>
+      </div>
+      <div class="item-nums">
+        <label class="field" style="margin-bottom:0;"><span>Qty</span>
+          <input type="number" class="it-qty" data-idx="${idx}" value="${it.qty}" min="0" step="any">
+        </label>
+        <label class="field" style="margin-bottom:0;"><span>Unit Price</span>
+          <input type="number" class="it-rate" data-idx="${idx}" value="${it.rate}" min="0" step="any">
+        </label>
+        <label class="field" style="margin-bottom:0;"><span>Total</span>
+          <input type="text" value="${fmtNum(it.qty*it.rate)}" disabled style="opacity:0.6">
+        </label>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll('.remove-item').forEach(btn=>{
+    btn.onclick = ()=>{ items.splice(+btn.dataset.idx,1); renderItemsUI(); render(); };
+  });
+  list.querySelectorAll('.it-desc').forEach(inp=>{
+    inp.oninput = ()=>{ items[+inp.dataset.idx].desc = inp.value; render(); };
+  });
+  list.querySelectorAll('.it-qty').forEach(inp=>{
+    inp.oninput = ()=>{ items[+inp.dataset.idx].qty = parseFloat(inp.value)||0; renderItemsUI(); render(); };
+  });
+  list.querySelectorAll('.it-rate').forEach(inp=>{
+    inp.oninput = ()=>{ items[+inp.dataset.idx].rate = parseFloat(inp.value)||0; renderItemsUI(); render(); };
+  });
+}
+
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+$('addItemBtn').onclick = ()=>{
+  items.push({desc:'', sub:'', qty:1, rate:0});
+  renderItemsUI(); render();
+};
+
+/* ============== Number / currency formatting ============== */
+function fmtNum(n){
+  return (Math.round(n*100)/100).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function fmtCurrency(n){
+  const sym = $('currency').value;
+  const pos = $('symbolPos').value;
+  const numStr = fmtNum(n);
+  return pos==='before' ? `${sym} ${numStr}` : `${numStr} ${sym}`;
+}
+
+/* ============== Main render ============== */
+function render(){
+  const t = i18n[lang];
+  const sheet = $('invoice-sheet');
+  sheet.className = 'lang-' + lang;
+  sheet.setAttribute('dir', (lang==='ur'||lang==='ar') ? 'rtl' : 'ltr');
+
+  // Header labels
+  $('lbl-issue').textContent = t.issue;
+  $('lbl-due').textContent = t.due;
+  $('lbl-billto').textContent = t.billto;
+  $('lbl-from').textContent = t.from;
+  $('th-desc').textContent = t.desc;
+  $('th-qty').textContent = t.qty;
+  $('th-rate').textContent = t.rate;
+  $('th-amt').textContent = t.amt;
+  $('lbl-notes').textContent = t.notes;
+  $('lbl-payment').textContent = t.payment;
+
+  const docTypeMap = {
+    'انوائس': {ur:'انوائس', en:'INVOICE', ar:'فاتورة'},
+    'پروفارما انوائس': {ur:'پروفارما انوائس', en:'PROFORMA INVOICE', ar:'فاتورة مبدئية'},
+    'ٹیکس انوائس': {ur:'ٹیکس انوائس', en:'TAX INVOICE', ar:'فاتورة ضريبية'},
+    'کریڈٹ نوٹ': {ur:'کریڈٹ نوٹ', en:'CREDIT NOTE', ar:'إشعار دائن'},
+    'رسید': {ur:'رسید', en:'RECEIPT', ar:'إيصال'},
+    'کوٹیشن': {ur:'کوٹیشن', en:'QUOTATION', ar:'عرض سعر'},
+  };
+  const docType = $('docType').value;
+  $('out-docType').textContent = (docTypeMap[docType] && docTypeMap[docType][lang]) || docType || t.invoice;
+  $('out-docNumber').textContent = $('docNumber').value;
+  $('out-issueDate').textContent = $('issueDate').value || '—';
+  $('out-dueDate').textContent = $('dueDate').value || '—';
+
+  // Issuer
+  const issuerName = $('issuerName').value || '—';
+  $('out-issuerName').textContent = issuerName;
+  $('out-issuerName2').textContent = issuerName;
+  $('logoFallback').textContent = issuerName.trim().charAt(0).toUpperCase() || '?';
+  $('out-issuerMeta').textContent = $('issuerMeta').value;
+  $('out-issuerMeta2').textContent = $('issuerMeta').value;
+  $('out-issuerTax').textContent = $('issuerTax').value ? ('Tax/Reg No: ' + $('issuerTax').value) : '';
+
+  // Client
+  $('out-clientName').textContent = $('clientName').value || '—';
+  $('out-clientMeta').textContent = $('clientMeta').value;
+
+  // Status seal
+  const status = $('docStatus').value;
+  const seal = $('statusSeal');
+  if(status==='none'){ seal.style.display='none'; }
+  else {
+    seal.style.display='block';
+    seal.textContent = status==='paid' ? 'PAID' : 'DUE';
+    seal.classList.toggle('due', status==='due');
+  }
+
+  // Items table
+  const tbody = $('out-items');
+  tbody.innerHTML = '';
+  let subtotal = 0;
+  items.forEach(it=>{
+    const amount = (it.qty||0) * (it.rate||0);
+    subtotal += amount;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="desc-cell"><div class="item-title">${escapeHtml(it.desc)||'—'}</div></td>
+      <td class="num">${fmtNum(it.qty)}</td>
+      <td class="num">${fmtCurrency(it.rate)}</td>
+      <td class="amt">${fmtCurrency(amount)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Totals
+  let discountAmt = 0;
+  if(discountOn){
+    const pct = parseFloat($('discountPercent').value)||0;
+    discountAmt = subtotal * (pct/100);
+  }
+  const taxedBase = subtotal - discountAmt;
+  let taxAmt = 0, taxLabel='';
+  if(taxOn){
+    const pct = parseFloat($('taxPercent').value)||0;
+    taxAmt = taxedBase * (pct/100);
+    taxLabel = `${$('taxLabel').value || 'Tax'} (${pct}%)`;
+  }
+  const shipping = parseFloat($('shippingAmt').value)||0;
+  const grandTotal = taxedBase + taxAmt + shipping;
+
+  const totalsBox = $('out-totals');
+  let html = `<div class="t-row"><span>${t.subtotal}</span><b>${fmtCurrency(subtotal)}</b></div>`;
+  if(discountOn){
+    html += `<div class="t-row"><span>${$('discountLabel').value || 'Discount'} (${$('discountPercent').value||0}%)</span><b>−${fmtCurrency(discountAmt)}</b></div>`;
+  }
+  if(taxOn){
+    html += `<div class="t-row"><span>${taxLabel}</span><b>${fmtCurrency(taxAmt)}</b></div>`;
+  }
+  if(shipping){
+    html += `<div class="t-row"><span>Shipping / Other</span><b>${fmtCurrency(shipping)}</b></div>`;
+  }
+  html += `<div class="t-grand"><span>${t.total}</span><span class="amt">${fmtCurrency(grandTotal)}</span></div>`;
+  totalsBox.innerHTML = html;
+
+  // Notes & bank
+  $('out-notes').textContent = $('notes').value;
+  const bankName = $('bankName').value, bankAcc = $('bankAcc').value;
+  const bankBlock = $('bankBlock');
+  if(bankName || bankAcc){
+    bankBlock.style.display='block';
+    $('out-bank').innerHTML = `
+      ${bankName ? `<div><span>${t.bank}</span><span>${escapeHtml(bankName)}</span></div>`:''}
+      ${bankAcc ? `<div><span>${t.account}</span><span>${escapeHtml(bankAcc)}</span></div>`:''}
+    `;
+  } else {
+    bankBlock.style.display='none';
+  }
+
+  $('out-footer').textContent = t.footer;
+}
+
+/* ============== Event wiring ============== */
+['docType','docNumber','issueDate','dueDate','docStatus','currency','symbolPos',
+ 'issuerName','issuerMeta','issuerTax','clientName','clientMeta',
+ 'taxLabel','taxPercent','discountLabel','discountPercent','shippingAmt',
+ 'bankName','bankAcc','notes'].forEach(id=>{
+  $(id).addEventListener('input', render);
+  $(id).addEventListener('change', render);
+});
+
+$('taxToggle').onclick = ()=>{ taxOn = !taxOn; syncTaxSwitch(); render(); };
+$('readmeToggle').onclick = ()=>{
+  $('readmeToggle').classList.toggle('on');
+  $('readmePanel').classList.toggle('open');
+};
+$('discountToggle').onclick = ()=>{
+  discountOn = !discountOn;
+  $('discountToggle').classList.toggle('on', discountOn);
+  $('discountRow').style.display = discountOn ? 'grid' : 'none';
+  render();
+};
+
+$('lang-toggle').querySelectorAll('button').forEach(btn=>{
+  btn.onclick = ()=>{
+    lang = btn.dataset.lang;
+    $('lang-toggle').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  };
+});
+
+$('printBtn').onclick = ()=>window.print();
+$('resetBtn').onclick = ()=>{
+  if(confirm('Are you sure you want to clear all fields?')){
+    location.reload();
+  }
+};
+
+$('zoomIn').onclick = ()=>{ scale = Math.min(1.3, scale+0.1); applyScale(true); };
+$('zoomOut').onclick = ()=>{ scale = Math.max(0.4, scale-0.1); applyScale(true); };
+function applyScale(manual){
+  if(manual) userScaled = true;
+  $('sheet-scaler').style.transform = `scale(${scale})`;
+  $('sheet-scaler').style.marginBottom = `${(scale-1)*1040}px`;
+  $('zoomLabel').textContent = `Zoom ${Math.round(scale*100)}%`;
+}
+let userScaled = false;
+function autoFit(){
+  if(userScaled) return;
+  const wrap = document.querySelector('.preview-wrap');
+  const available = wrap.clientWidth - 32;
+  const sheetWidth = 780;
+  scale = available < sheetWidth ? Math.max(0.4, available/sheetWidth) : 1;
+  applyScale(false);
+}
+window.addEventListener('resize', autoFit);
+
+/* ============== Init ============== */
+function setDefaultDates(){
+  const today = new Date();
+  const due = new Date(); due.setDate(due.getDate()+15);
+  $('issueDate').value = today.toISOString().slice(0,10);
+  $('dueDate').value = due.toISOString().slice(0,10);
+}
+
+renderTemplateGrid();
+renderItemsUI();
+setDefaultDates();
+syncTaxSwitch();
+render();
+autoFit();
+</script>
+</body>
+</html>
