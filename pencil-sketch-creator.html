@@ -411,7 +411,7 @@
   <header>
     <span class="pencil-icon">✏️</span>
     <h1>Pencil Sketch Creator</h1>
-    <p class="subtitle">Describe your idea, and AI will turn it into a pencil sketch</p>
+    <p class="subtitle">Describe your idea, and AI will turn it into a sketch or a full color image</p>
   </header>
 
   <div class="card">
@@ -419,13 +419,15 @@
     <label for="prompt">What would you like to create?</label>
     <textarea id="prompt" placeholder="e.g. An old man drinking tea, a village house near the mountains..."></textarea>
 
-    <label style="margin-top:16px;">Sketch Style</label>
+    <label style="margin-top:16px;">Art Style</label>
     <div class="style-chips" id="styleChips">
-      <div class="chip active" data-style="pencil sketch, graphite drawing, detailed shading, hand drawn, black and white">Graphite Pencil</div>
-      <div class="chip" data-style="charcoal sketch drawing, dramatic shading, artistic, black and white">Charcoal</div>
-      <div class="chip" data-style="ink pen sketch, cross hatching, line art, detailed">Pen Sketch</div>
-      <div class="chip" data-style="colored pencil sketch, soft shading, artistic illustration">Colored Pencil</div>
-      <div class="chip" data-style="watercolor pencil sketch, soft tones, artistic">Watercolor</div>
+      <div class="chip active" data-style="pencil sketch, graphite drawing, detailed shading, hand drawn, black and white" data-colored="false">Graphite Pencil</div>
+      <div class="chip" data-style="charcoal sketch drawing, dramatic shading, artistic, black and white" data-colored="false">Charcoal</div>
+      <div class="chip" data-style="ink pen sketch, cross hatching, line art, detailed" data-colored="false">Pen Sketch</div>
+      <div class="chip" data-style="colored pencil sketch, soft shading, artistic illustration" data-colored="false">Colored Pencil</div>
+      <div class="chip" data-style="watercolor pencil sketch, soft tones, artistic" data-colored="false">Watercolor</div>
+      <div class="chip" data-style="photorealistic, DSLR photograph, sharp focus, natural lighting, highly detailed, realistic colors" data-colored="true">Realistic Photo</div>
+      <div class="chip" data-style="oil painting, rich vivid colors, painterly brush strokes, fine art, detailed, masterpiece" data-colored="true">Oil Painting</div>
     </div>
 
     <div class="row" id="sizeRow">
@@ -467,6 +469,11 @@ document.querySelectorAll('.chip').forEach(chip => {
   });
 });
 
+function isColoredStyle(){
+  const active = document.querySelector('.chip.active');
+  return active ? active.dataset.colored === 'true' : false;
+}
+
 function getActiveStyle(){
   const active = document.querySelector('.chip.active');
   return active ? active.dataset.style : 'pencil sketch, graphite drawing, detailed shading';
@@ -480,6 +487,9 @@ function setStatus(msg, isError){
 
 function buildPrompt(userText){
   const style = getActiveStyle();
+  if(isColoredStyle()){
+    return `${userText}, ${style}, vivid colors, high quality, detailed`;
+  }
   return `${userText}, ${style}, fine line detail, high contrast, white paper background, professional sketch art`;
 }
 
