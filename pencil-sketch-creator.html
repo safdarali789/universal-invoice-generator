@@ -493,7 +493,49 @@ function buildPrompt(userText){
   return `${userText}, ${style}, fine line detail, high contrast, white paper background, professional sketch art`;
 }
 
-async function generateSketch(){
+function getSketchShape(promptText){
+  const text = promptText.toLowerCase();
+
+  const shapes = {
+    face: { main: "M 100 40 Q 150 40 150 100 Q 150 160 100 170 Q 50 160 50 100 Q 50 40 100 40 Z", extra: "M 75 90 Q 80 85 85 90 M 115 90 Q 120 85 125 90 M 85 130 Q 100 140 115 130" },
+    person: { main: "M 100 40 Q 150 40 150 100 Q 150 160 100 170 Q 50 160 50 100 Q 50 40 100 40 Z", extra: "M 75 90 Q 80 85 85 90 M 115 90 Q 120 85 125 90 M 85 130 Q 100 140 115 130" },
+    girl: { main: "M 100 40 Q 150 40 150 100 Q 150 160 100 170 Q 50 160 50 100 Q 50 40 100 40 Z", extra: "M 75 90 Q 80 85 85 90 M 115 90 Q 120 85 125 90 M 85 130 Q 100 140 115 130" },
+    boy: { main: "M 100 40 Q 150 40 150 100 Q 150 160 100 170 Q 50 160 50 100 Q 50 40 100 40 Z", extra: "M 75 90 Q 80 85 85 90 M 115 90 Q 120 85 125 90 M 85 130 Q 100 140 115 130" },
+    woman: { main: "M 100 40 Q 150 40 150 100 Q 150 160 100 170 Q 50 160 50 100 Q 50 40 100 40 Z", extra: "M 75 90 Q 80 85 85 90 M 115 90 Q 120 85 125 90 M 85 130 Q 100 140 115 130" },
+    man: { main: "M 100 40 Q 150 40 150 100 Q 150 160 100 170 Q 50 160 50 100 Q 50 40 100 40 Z", extra: "M 75 90 Q 80 85 85 90 M 115 90 Q 120 85 125 90 M 85 130 Q 100 140 115 130" },
+
+    car: { main: "M 25 130 L 35 95 Q 45 80 70 80 L 130 80 Q 155 80 165 95 L 175 130 Z", extra: "M 55 130 Q 55 145 70 145 Q 85 145 85 130 M 115 130 Q 115 145 130 145 Q 145 145 145 130" },
+
+    house: { main: "M 40 170 L 40 100 L 100 50 L 160 100 L 160 170 Z", extra: "M 85 170 L 85 130 L 115 130 L 115 170 M 55 115 L 75 115 L 75 95 L 55 95 Z" },
+    home: { main: "M 40 170 L 40 100 L 100 50 L 160 100 L 160 170 Z", extra: "M 85 170 L 85 130 L 115 130 L 115 170 M 55 115 L 75 115 L 75 95 L 55 95 Z" },
+    village: { main: "M 40 170 L 40 100 L 100 50 L 160 100 L 160 170 Z", extra: "M 85 170 L 85 130 L 115 130 L 115 170 M 55 115 L 75 115 L 75 95 L 55 95 Z" },
+
+    flower: { main: "M 100 80 Q 80 60 100 40 Q 120 60 100 80 M 100 80 Q 130 70 140 95 Q 115 100 100 80 M 100 80 Q 130 100 120 125 Q 95 115 100 80 M 100 80 Q 70 100 80 125 Q 105 115 100 80 M 100 80 Q 70 70 60 95 Q 85 100 100 80", extra: "M 100 95 L 100 165" },
+    rose: { main: "M 100 80 Q 80 60 100 40 Q 120 60 100 80 M 100 80 Q 130 70 140 95 Q 115 100 100 80 M 100 80 Q 130 100 120 125 Q 95 115 100 80 M 100 80 Q 70 100 80 125 Q 105 115 100 80 M 100 80 Q 70 70 60 95 Q 85 100 100 80", extra: "M 100 95 L 100 165" },
+    garden: { main: "M 100 80 Q 80 60 100 40 Q 120 60 100 80 M 100 80 Q 130 70 140 95 Q 115 100 100 80 M 100 80 Q 130 100 120 125 Q 95 115 100 80 M 100 80 Q 70 100 80 125 Q 105 115 100 80 M 100 80 Q 70 70 60 95 Q 85 100 100 80", extra: "M 100 95 L 100 165" },
+
+    tree: { main: "M 100 60 Q 60 60 60 100 Q 60 120 90 120 Q 70 140 100 140 Q 130 140 110 120 Q 140 120 140 100 Q 140 60 100 60 Z", extra: "M 100 140 L 100 175" },
+    mountain: { main: "M 30 160 L 75 80 L 105 120 L 130 70 L 175 160 Z", extra: "M 90 100 L 100 115 M 115 95 L 125 110" },
+
+    cat: { main: "M 70 70 L 55 40 L 80 60 Q 100 50 120 60 L 145 40 L 130 70 Q 145 90 145 115 Q 145 150 100 150 Q 55 150 55 115 Q 55 90 70 70 Z", extra: "M 80 100 L 85 105 M 120 100 L 115 105 M 90 115 Q 100 120 110 115" },
+    dog: { main: "M 70 75 Q 55 60 50 80 Q 50 95 65 95 L 70 110 Q 60 130 70 150 Q 100 165 130 150 Q 140 130 130 110 L 135 95 Q 150 95 150 80 Q 145 60 130 75 Q 115 60 100 60 Q 85 60 70 75 Z", extra: "M 88 105 L 92 110 M 108 105 L 112 110" },
+
+    bird: { main: "M 50 110 Q 70 80 100 90 Q 130 80 150 110 Q 120 105 110 115 Q 100 100 90 115 Q 80 105 50 110 Z", extra: "M 100 90 L 100 70 M 95 70 L 105 65" },
+
+    sun: { main: "M 100 60 A 35 35 0 1 1 99.9 60 Z", extra: "M 100 15 L 100 30 M 100 90 L 100 105 M 55 60 L 70 60 M 130 60 L 145 60 M 68 28 L 78 38 M 122 82 L 132 92 M 132 28 L 122 38 M 78 82 L 68 92" },
+
+    boat: { main: "M 40 120 Q 100 145 160 120 L 145 95 L 55 95 Z", extra: "M 100 95 L 100 50 M 100 55 L 130 70 L 100 75" },
+    ship: { main: "M 40 120 Q 100 145 160 120 L 145 95 L 55 95 Z", extra: "M 100 95 L 100 50 M 100 55 L 130 70 L 100 75" }
+  };
+
+  const keys = Object.keys(shapes);
+  for(const key of keys){
+    if(text.includes(key)) return shapes[key];
+  }
+  return null;
+}
+
+
   const promptInput = document.getElementById('prompt').value.trim();
   if(!promptInput){
     setStatus('Please describe what you would like to create first.', true);
@@ -504,12 +546,17 @@ async function generateSketch(){
   btn.disabled = true;
   btn.textContent = 'Generating...';
   setStatus('');
+
+  const matchedShape = getSketchShape(promptInput);
+  const mainPath = matchedShape ? matchedShape.main : "M 30 150 Q 50 60 100 90 T 160 60 Q 140 120 90 130 T 40 100";
+  const extraPath = matchedShape ? matchedShape.extra : "M 60 40 Q 100 20 140 45";
+
   document.getElementById('resultArea').innerHTML = `
     <div class="drawing-loader">
       <div class="drawing-paper">
         <svg viewBox="0 0 200 200">
-          <path class="sketch-path" d="M 30 150 Q 50 60 100 90 T 160 60 Q 140 120 90 130 T 40 100" />
-          <path class="sketch-path-2" d="M 60 40 Q 100 20 140 45" />
+          <path class="sketch-path" d="${mainPath}" />
+          <path class="sketch-path-2" d="${extraPath}" />
         </svg>
         <span class="pencil-tip">✏️</span>
       </div>
