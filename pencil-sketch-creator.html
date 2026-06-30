@@ -3,22 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wood Engraving Card Creator</title>
+<title>Pencil Sketch Creator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --wood-dark: #3E2723;
-    --wood-mid: #6D4C2F;
-    --wood-light: #C9A36A;
-    --cream: #F4ECDD;
-    --gold: #C9952C;
     --paper: #F7F5F0;
-    --ink: #2B2320;
+    --paper-2: #EFEBE2;
+    --graphite: #2B2B2B;
     --pencil: #6B6B6B;
     --pencil-light: #9C9C94;
+    --eraser: #D9A5A0;
+    --eraser-dark: #C2837D;
+    --blueline: #A9C4D4;
     --line: #D8D2C3;
-    --error: #B5524A;
   }
 
   *{box-sizing:border-box;}
@@ -26,181 +24,226 @@
   body{
     margin:0;
     background:var(--paper);
-    color:var(--ink);
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(169,196,212,0.10), transparent 40%),
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.012) 0px, rgba(0,0,0,0.012) 1px, transparent 1px, transparent 3px);
+    color:var(--graphite);
     font-family:'Inter', sans-serif;
     min-height:100vh;
   }
 
+  .sketch-font{ font-family:'Architects Daughter', cursive; }
+
   .wrap{
     max-width:720px;
     margin:0 auto;
-    padding:24px 16px 60px;
+    padding:28px 18px 60px;
   }
 
   header{
     text-align:center;
-    margin-bottom:24px;
+    margin-bottom:28px;
+    position:relative;
   }
 
-  header .icon{
-    font-size:32px;
+  header .pencil-icon{
+    font-size:34px;
     display:block;
     margin-bottom:6px;
+    transform:rotate(-8deg);
   }
 
   h1{
-    font-family:'Playfair Display', serif;
-    font-size:1.9rem;
+    font-family:'Architects Daughter', cursive;
+    font-size:2.1rem;
     margin:0 0 4px;
-    color:var(--wood-dark);
+    color:var(--graphite);
+    line-height:1.3;
   }
 
   .subtitle{
     color:var(--pencil);
-    font-size:0.92rem;
+    font-size:0.95rem;
     margin:0;
   }
 
   .card{
     background:#fff;
-    border:1.5px solid var(--line);
-    border-radius:6px;
-    padding:18px;
-    margin-bottom:18px;
+    border:1.5px solid var(--graphite);
+    border-radius:3px;
+    padding:20px;
+    margin-bottom:22px;
+    box-shadow: 4px 4px 0 rgba(43,43,43,0.08);
+    position:relative;
+  }
+
+  .card::before{
+    content:'';
+    position:absolute;
+    top:-1px; left:-1px; right:-1px; bottom:-1px;
+    border:1px dashed transparent;
+    pointer-events:none;
   }
 
   label{
     display:block;
     font-size:0.85rem;
     color:var(--pencil);
-    margin-bottom:8px;
+    margin-bottom:6px;
     font-weight:600;
   }
 
-  .occasion-grid{
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:8px;
-    margin-bottom:18px;
-  }
-
-  .occasion-chip{
-    padding:12px 6px;
-    border:1.5px solid var(--line);
-    border-radius:6px;
-    text-align:center;
-    cursor:pointer;
-    font-size:0.8rem;
-    background:#fff;
-    transition:all 0.15s ease;
-  }
-
-  .occasion-chip .emoji{
-    display:block;
-    font-size:20px;
-    margin-bottom:4px;
-  }
-
-  .occasion-chip.active{
-    border-color:var(--wood-mid);
-    background:var(--cream);
-    font-weight:600;
-  }
-
-  textarea, input[type="text"]{
+  textarea{
     width:100%;
-    padding:11px;
+    min-height:90px;
+    padding:12px;
     border:1.5px solid var(--line);
-    border-radius:4px;
+    border-radius:2px;
     background:var(--paper);
+    font-family:'Inter', sans-serif;
     font-size:1rem;
-    color:var(--ink);
-    font-family:'Noto Nastaliq Urdu', 'Inter', sans-serif;
+    color:var(--graphite);
+    resize:vertical;
+    line-height:1.7;
   }
 
-  textarea{ min-height:60px; resize:vertical; line-height:1.6; }
-
-  textarea:focus, input:focus, select:focus{
+  textarea:focus, select:focus{
     outline:none;
-    border-color:var(--wood-mid);
+    border-color:var(--blueline);
+    box-shadow:0 0 0 3px rgba(169,196,212,0.3);
   }
 
   .row{
     display:flex;
-    gap:10px;
+    gap:12px;
+    margin-top:16px;
     flex-wrap:wrap;
   }
 
-  .field{ flex:1; min-width:130px; }
-
-  .field-label{
-    font-size:0.78rem;
-    color:var(--pencil-light);
-    margin:10px 0 4px;
+  .field{
+    flex:1;
+    min-width:140px;
   }
 
   select{
     width:100%;
-    padding:9px;
+    padding:10px;
     border:1.5px solid var(--line);
-    border-radius:4px;
+    border-radius:2px;
     background:#fff;
-    font-size:0.88rem;
+    font-size:0.92rem;
+    color:var(--graphite);
+    font-family:inherit;
   }
 
-  .font-chips{
+  .style-chips{
     display:flex;
     gap:8px;
     flex-wrap:wrap;
-    margin-top:6px;
+    margin-top:8px;
   }
 
-  .font-chip{
+  .chip{
     padding:7px 14px;
     border:1.5px solid var(--line);
     border-radius:20px;
-    font-size:0.82rem;
-    cursor:pointer;
     background:#fff;
+    font-size:0.82rem;
+    color:var(--pencil);
+    cursor:pointer;
+    transition:all 0.15s ease;
+    user-select:none;
   }
 
-  .font-chip.active{
-    background:var(--wood-dark);
-    color:var(--cream);
-    border-color:var(--wood-dark);
+  .chip:hover{ border-color:var(--pencil-light); }
+
+  .chip.active{
+    background:var(--graphite);
+    color:var(--paper);
+    border-color:var(--graphite);
   }
 
   button.generate{
     width:100%;
-    margin-top:18px;
-    padding:14px;
-    background:var(--wood-dark);
-    color:var(--cream);
+    margin-top:20px;
+    padding:15px;
+    background:var(--graphite);
+    color:var(--paper);
     border:none;
-    border-radius:5px;
-    font-size:1rem;
+    border-radius:2px;
+    font-size:1.05rem;
     font-weight:600;
     cursor:pointer;
-    font-family:'Playfair Display', serif;
+    font-family:'Architects Daughter', cursive;
+    letter-spacing:0.3px;
+    transition:transform 0.1s ease, background 0.15s ease;
+    position:relative;
   }
 
-  button.generate:hover{ background:#2C1B17; }
-  button.generate:disabled{ background:#999; cursor:wait; }
+  button.generate:active{ transform:translateY(1px); }
+  button.generate:hover{ background:#3d3d3d; }
+
+  button.generate:disabled{
+    background:var(--pencil-light);
+    cursor:wait;
+  }
+
+  .result-area{
+    margin-top:24px;
+    text-align:center;
+  }
+
+  .sketch-frame{
+    display:inline-block;
+    background:#fff;
+    padding:14px 14px 36px;
+    border-radius:2px;
+    box-shadow:0 8px 24px rgba(43,43,43,0.18), 0 1px 0 rgba(0,0,0,0.05);
+    transform:rotate(-1.2deg);
+    max-width:100%;
+    position:relative;
+  }
+
+  .sketch-frame::after{
+    content:'';
+    position:absolute;
+    bottom:8px; left:50%;
+    transform:translateX(-50%);
+    width:40px; height:2px;
+    background:var(--eraser);
+    border-radius:2px;
+    opacity:0.6;
+  }
+
+  .sketch-frame img{
+    max-width:100%;
+    display:block;
+    border-radius:1px;
+    background:var(--paper-2);
+    min-height:200px;
+  }
+
+  .caption{
+    font-family:'Architects Daughter', cursive;
+    color:var(--pencil);
+    font-size:0.95rem;
+    margin-top:6px;
+  }
 
   .status{
     text-align:center;
     color:var(--pencil);
     font-size:0.9rem;
-    margin:14px 0;
+    margin-top:16px;
     min-height:20px;
   }
 
-  .status.error{ color:var(--error); font-weight:600; }
+  .status.error{ color:var(--eraser-dark); font-weight:600; }
 
   .loading-dots span{
     display:inline-block;
     width:6px; height:6px;
-    background:var(--wood-mid);
+    background:var(--pencil);
     border-radius:50%;
     margin:0 2px;
     animation:bounce 1.2s infinite ease-in-out;
@@ -213,114 +256,152 @@
     40% { transform:translateY(-6px); opacity:1; }
   }
 
-  .card-preview-wrap{
+  .drawing-loader{
     text-align:center;
-    margin-top:6px;
+    margin-top:20px;
   }
 
-  .card-stage{
-    position:relative;
+  .drawing-paper{
     display:inline-block;
-    max-width:100%;
-    border-radius:8px;
-    overflow:hidden;
-    box-shadow:0 10px 30px rgba(62,39,35,0.25);
+    background:#fff;
+    border-radius:3px;
+    padding:18px;
+    box-shadow:0 8px 20px rgba(43,43,43,0.15);
+    transform:rotate(-1deg);
+    position:relative;
+    width:220px;
+    height:220px;
   }
 
-  .card-stage img{
-    display:block;
-    max-width:100%;
+  .drawing-paper svg{
     width:100%;
-    background:var(--wood-mid);
-    min-height:260px;
+    height:100%;
+    display:block;
   }
 
-  .overlay-text{
+  .sketch-path{
+    fill:none;
+    stroke:var(--graphite);
+    stroke-width:2.2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    stroke-dasharray:900;
+    stroke-dashoffset:900;
+    animation:draw-line 3.5s ease-in-out infinite;
+  }
+
+  .sketch-path-2{
+    fill:none;
+    stroke:var(--pencil-light);
+    stroke-width:1.4;
+    stroke-linecap:round;
+    stroke-dasharray:500;
+    stroke-dashoffset:500;
+    animation:draw-line2 3.5s ease-in-out infinite;
+    animation-delay:0.2s;
+  }
+
+  @keyframes draw-line{
+    0%{ stroke-dashoffset:900; }
+    60%{ stroke-dashoffset:0; }
+    85%{ stroke-dashoffset:0; opacity:1; }
+    100%{ stroke-dashoffset:0; opacity:0; }
+  }
+
+  @keyframes draw-line2{
+    0%{ stroke-dashoffset:500; opacity:0; }
+    15%{ opacity:1; }
+    70%{ stroke-dashoffset:0; }
+    90%{ stroke-dashoffset:0; opacity:1; }
+    100%{ stroke-dashoffset:0; opacity:0; }
+  }
+
+  .pencil-tip{
     position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%, -50%);
-    text-align:center;
-    width:80%;
-    pointer-events:none;
-    line-height:1.3;
+    font-size:22px;
+    transform-origin:bottom left;
+    animation:pencil-move 3.5s ease-in-out infinite;
   }
 
-  .overlay-text.engrave-dark{
-    color:rgba(40,25,15,0.85);
-    text-shadow:
-      0px 1px 0px rgba(255,235,200,0.5),
-      0px -1px 1px rgba(0,0,0,0.6),
-      1px 1px 2px rgba(0,0,0,0.4);
+  @keyframes pencil-move{
+    0%{ top:38%; left:14%; transform:rotate(-35deg); opacity:1; }
+    25%{ top:20%; left:55%; transform:rotate(-15deg); opacity:1; }
+    45%{ top:60%; left:75%; transform:rotate(-50deg); opacity:1; }
+    60%{ top:70%; left:30%; transform:rotate(-30deg); opacity:1; }
+    85%{ top:45%; left:50%; transform:rotate(-40deg); opacity:1; }
+    100%{ top:45%; left:50%; transform:rotate(-40deg); opacity:0; }
   }
 
-  .overlay-text.engrave-light{
-    color:rgba(255,244,220,0.92);
-    text-shadow:
-      0px 1px 1px rgba(0,0,0,0.65),
-      0px -1px 0px rgba(255,255,255,0.25),
-      0px 2px 3px rgba(0,0,0,0.5);
+  .drawing-caption{
+    font-family:'Architects Daughter', cursive;
+    color:var(--pencil);
+    font-size:1rem;
+    margin-top:12px;
   }
 
   .actions{
     display:flex;
     gap:10px;
     justify-content:center;
-    margin-top:16px;
+    margin-top:18px;
     flex-wrap:wrap;
   }
 
   .actions button{
     padding:10px 18px;
-    border:1.5px solid var(--wood-dark);
+    border:1.5px solid var(--graphite);
     background:#fff;
-    color:var(--wood-dark);
+    color:var(--graphite);
     border-radius:20px;
     font-size:0.85rem;
     cursor:pointer;
     font-weight:600;
   }
 
-  .actions button:hover{ background:var(--wood-dark); color:var(--cream); }
+  .actions button:hover{ background:var(--graphite); color:var(--paper); }
 
-  .position-controls{
-    display:flex;
-    gap:8px;
-    justify-content:center;
-    margin-top:12px;
-    flex-wrap:wrap;
+  .history{
+    margin-top:32px;
   }
 
-  .position-controls label{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:0.78rem;
-    margin:0;
-  }
-
-  .position-controls input[type="range"]{
-    width:90px;
-  }
-
-  .note{
-    font-size:0.78rem;
-    color:var(--pencil-light);
-    margin-top:8px;
+  .history h3{
+    font-family:'Architects Daughter', cursive;
+    font-size:1.1rem;
+    color:var(--pencil);
+    margin-bottom:10px;
     text-align:center;
   }
+
+  .history-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:8px;
+  }
+
+  .history-grid img{
+    width:100%;
+    aspect-ratio:1;
+    object-fit:cover;
+    border-radius:3px;
+    border:1.5px solid var(--line);
+    cursor:pointer;
+    transition:border-color 0.15s;
+  }
+
+  .history-grid img:hover{ border-color:var(--blueline); }
 
   footer{
     text-align:center;
-    margin-top:30px;
-    color:#bbb;
+    margin-top:36px;
+    color:var(--pencil-light);
     font-size:0.78rem;
   }
 
   @media (max-width:420px){
-    h1{ font-size:1.5rem; }
-    .card{ padding:14px; }
+    h1{ font-size:1.7rem; }
+    .card{ padding:16px; }
   }
+
 </style>
 </head>
 <body>
@@ -328,105 +409,67 @@
 <div class="wrap">
 
   <header>
-    <span class="icon">🪵</span>
-    <h1>Wood Engraving Card Creator</h1>
-    <p class="subtitle">Create a custom wooden card for any occasion — Eid, birthdays, name plates, weddings, and more</p>
+    <span class="pencil-icon">✏️</span>
+    <h1>Pencil Sketch Creator</h1>
+    <p class="subtitle">Describe your idea, and AI will turn it into a pencil sketch</p>
   </header>
 
   <div class="card">
-    <label>Choose an Occasion / Style</label>
-    <div class="occasion-grid" id="occasionGrid">
-      <div class="occasion-chip active" data-style="ornate wooden carved frame with crescent moon and star decoration, warm brown wood texture, elegant Islamic geometric border, empty space in center" data-name="Eid">
-        <span class="emoji">🌙</span>Eid
-      </div>
-      <div class="occasion-chip" data-style="wooden carved birthday frame with balloons and confetti decoration carved into wood, warm wood texture, empty space in center" data-name="Birthday">
-        <span class="emoji">🎂</span>Birthday
-      </div>
-      <div class="occasion-chip" data-style="elegant engraved wooden name plate, polished mahogany wood texture, simple decorative border, empty space in center for text" data-name="Name Plate">
-        <span class="emoji">🪧</span>Name Plate
-      </div>
-      <div class="occasion-chip" data-style="wooden carved wedding frame with floral vine decoration, light oak wood texture, romantic ornate border, empty space in center" data-name="Wedding">
-        <span class="emoji">💍</span>Wedding
-      </div>
-      <div class="occasion-chip" data-style="wooden carved frame with festive ribbon and star decoration, rich walnut wood texture, celebratory border, empty space in center" data-name="Celebration">
-        <span class="emoji">🎉</span>Celebration
-      </div>
-      <div class="occasion-chip" data-style="plain elegant wooden frame, natural wood grain texture, simple clean border, empty space in center for text" data-name="Custom">
-        <span class="emoji">🪶</span>Custom
-      </div>
+
+    <label for="prompt">What would you like to create?</label>
+    <textarea id="prompt" placeholder="e.g. An old man drinking tea, a village house near the mountains..."></textarea>
+
+    <label style="margin-top:16px;">Sketch Style</label>
+    <div class="style-chips" id="styleChips">
+      <div class="chip active" data-style="pencil sketch, graphite drawing, detailed shading, hand drawn, black and white">Graphite Pencil</div>
+      <div class="chip" data-style="charcoal sketch drawing, dramatic shading, artistic, black and white">Charcoal</div>
+      <div class="chip" data-style="ink pen sketch, cross hatching, line art, detailed">Pen Sketch</div>
+      <div class="chip" data-style="colored pencil sketch, soft shading, artistic illustration">Colored Pencil</div>
+      <div class="chip" data-style="watercolor pencil sketch, soft tones, artistic">Watercolor</div>
     </div>
 
-    <label>Your Text (name, message, or greeting)</label>
-    <textarea id="overlayText" placeholder="e.g. Eid Mubarak, or Ahmed's House, or Happy Birthday Sara"></textarea>
-
-    <div class="field-label">Font Style</div>
-    <div class="font-chips" id="fontChips">
-      <div class="font-chip active" data-font="'Playfair Display', serif">Elegant</div>
-      <div class="font-chip" data-font="'Noto Nastaliq Urdu', serif">Urdu Script</div>
-      <div class="font-chip" data-font="'Amiri', serif">Classic Arabic/Urdu</div>
-    </div>
-
-    <div class="row" style="margin-top:14px;">
+    <div class="row" id="sizeRow">
       <div class="field">
-        <div class="field-label">Engrave Style</div>
-        <select id="engraveStyle">
-          <option value="engrave-dark">Carved (dark wood)</option>
-          <option value="engrave-light" selected>Gold-Filled Engraving</option>
-        </select>
-      </div>
-      <div class="field">
-        <div class="field-label">Text Size</div>
-        <select id="textSize">
-          <option value="1.4">Small</option>
-          <option value="2" selected>Medium</option>
-          <option value="2.8">Large</option>
+        <label>Size</label>
+        <select id="size">
+          <option value="1024x1024">Square (1024×1024)</option>
+          <option value="1024x1536">Portrait (1024×1536)</option>
+          <option value="1536x1024">Landscape (1536×1024)</option>
         </select>
       </div>
     </div>
 
-    <button class="generate" id="genBtn" onclick="generateCard()">Generate Wood Card</button>
+    <button class="generate" id="genBtn" onclick="generateSketch()">Generate Sketch</button>
   </div>
 
   <div class="status" id="status"></div>
 
-  <div class="card-preview-wrap" id="resultArea"></div>
+  <div class="result-area" id="resultArea"></div>
+
+  <div class="history" id="historySection" style="display:none;">
+    <h3>Recent Sketches</h3>
+    <div class="history-grid" id="historyGrid"></div>
+  </div>
 
   <footer>
-    Background generated by free public AI image generation • Text rendered locally for accuracy
+    Powered by free public AI image generation • No login required
   </footer>
 
 </div>
 
 <script>
-let currentImageUrl = null;
+let history = [];
 
-document.querySelectorAll('.occasion-chip').forEach(chip => {
+document.querySelectorAll('.chip').forEach(chip => {
   chip.addEventListener('click', () => {
-    document.querySelectorAll('.occasion-chip').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
   });
 });
 
-document.querySelectorAll('.font-chip').forEach(chip => {
-  chip.addEventListener('click', () => {
-    document.querySelectorAll('.font-chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    updateOverlayStyle();
-  });
-});
-
-document.getElementById('engraveStyle').addEventListener('change', updateOverlayStyle);
-document.getElementById('textSize').addEventListener('change', updateOverlayStyle);
-document.getElementById('overlayText').addEventListener('input', updateOverlayText);
-
-function getActiveOccasion(){
-  const active = document.querySelector('.occasion-chip.active');
-  return active ? active.dataset.style : 'elegant wooden frame, natural wood grain texture';
-}
-
-function getActiveFont(){
-  const active = document.querySelector('.font-chip.active');
-  return active ? active.dataset.font : "'Playfair Display', serif";
+function getActiveStyle(){
+  const active = document.querySelector('.chip.active');
+  return active ? active.dataset.style : 'pencil sketch, graphite drawing, detailed shading';
 }
 
 function setStatus(msg, isError){
@@ -435,19 +478,41 @@ function setStatus(msg, isError){
   el.className = 'status' + (isError ? ' error' : '');
 }
 
-async function generateCard(){
-  const style = getActiveOccasion();
-  const fullPrompt = `${style}, high quality realistic wood carving, photorealistic, professional, vertical card composition, no text, no letters, no writing`;
+function buildPrompt(userText){
+  const style = getActiveStyle();
+  return `${userText}, ${style}, fine line detail, high contrast, white paper background, professional sketch art`;
+}
+
+async function generateSketch(){
+  const promptInput = document.getElementById('prompt').value.trim();
+  if(!promptInput){
+    setStatus('Please describe what you would like to create first.', true);
+    return;
+  }
 
   const btn = document.getElementById('genBtn');
   btn.disabled = true;
   btn.textContent = 'Generating...';
-  setStatus('<span class="loading-dots"><span></span><span></span><span></span></span> Creating your wooden card, this can take up to 30 seconds...');
-  document.getElementById('resultArea').innerHTML = '';
+  setStatus('');
+  document.getElementById('resultArea').innerHTML = `
+    <div class="drawing-loader">
+      <div class="drawing-paper">
+        <svg viewBox="0 0 200 200">
+          <path class="sketch-path" d="M 30 150 Q 50 60 100 90 T 160 60 Q 140 120 90 130 T 40 100" />
+          <path class="sketch-path-2" d="M 60 40 Q 100 20 140 45" />
+        </svg>
+        <span class="pencil-tip">✏️</span>
+      </div>
+      <p class="drawing-caption">Sketching your idea, this can take up to 30 seconds...</p>
+    </div>
+  `;
 
+  const fullPrompt = buildPrompt(promptInput);
+  const size = document.getElementById('size').value;
+  const [w, h] = size.split('x');
   const seed = Math.floor(Math.random() * 1000000);
   const encodedPrompt = encodeURIComponent(fullPrompt);
-  const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1280&seed=${seed}&model=flux`;
+  const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${w}&height=${h}&seed=${seed}&model=flux`;
 
   const img = new Image();
   let settled = false;
@@ -457,14 +522,15 @@ async function generateCard(){
     settled = true;
     clearTimeout(timeoutId);
     btn.disabled = false;
-    btn.textContent = 'Generate Wood Card';
+    btn.textContent = 'Generate Sketch';
 
     if(success){
       setStatus('');
-      currentImageUrl = imageUrl;
-      showCard(imageUrl);
+      showResult(imageUrl, promptInput);
+      addToHistory(imageUrl, promptInput);
     } else {
-      setStatus('Sorry, the card background did not load in time. The server may be busy — please try again.', true);
+      document.getElementById('resultArea').innerHTML = '';
+      setStatus('Sorry, the sketch did not load in time. The server may be busy — please try again.', true);
     }
   };
 
@@ -475,143 +541,56 @@ async function generateCard(){
   img.src = imageUrl;
 }
 
-function showCard(imageUrl){
-  const text = document.getElementById('overlayText').value.trim() || 'Your Text Here';
-  const font = getActiveFont();
-  const engraveClass = document.getElementById('engraveStyle').value;
-  const size = document.getElementById('textSize').value;
-
+function showResult(imageUrl, captionText){
+  const shortCaption = captionText.length > 60 ? captionText.slice(0,60)+'…' : captionText;
   document.getElementById('resultArea').innerHTML = `
-    <div class="card-stage" id="cardStage">
-      <img src="${imageUrl}" alt="Wooden card background">
-      <div class="overlay-text ${engraveClass}" id="overlayDiv" style="font-family:${font}; font-size:${size}rem;">${escapeHtml(text)}</div>
-    </div>
-    <div class="position-controls">
-      <label>Vertical: <input type="range" id="posY" min="10" max="90" value="50" oninput="updatePosition()"></label>
+    <div class="sketch-frame">
+      <img src="${imageUrl}" alt="Generated sketch">
+      <div class="caption">"${shortCaption}"</div>
     </div>
     <div class="actions">
-      <button onclick="downloadCard()">⬇ Download</button>
-      <button onclick="generateCard()">🔄 New Background</button>
+      <button onclick="downloadImage('${imageUrl}')">⬇ Download</button>
+      <button onclick="generateSketch()">🔄 Regenerate</button>
     </div>
-    <p class="note">Tip: adjust the slider to move your text up or down on the card</p>
   `;
 }
 
-function updatePosition(){
-  const val = document.getElementById('posY').value;
-  const overlay = document.getElementById('overlayDiv');
-  if(overlay) overlay.style.top = val + '%';
+function addToHistory(url, prompt){
+  history.unshift({url, prompt});
+  if(history.length > 9) history.pop();
+  renderHistory();
 }
 
-function updateOverlayText(){
-  const overlay = document.getElementById('overlayDiv');
-  if(overlay) overlay.textContent = document.getElementById('overlayText').value.trim() || 'Your Text Here';
+function renderHistory(){
+  if(history.length === 0) return;
+  document.getElementById('historySection').style.display = 'block';
+  const grid = document.getElementById('historyGrid');
+  grid.innerHTML = history.map(h =>
+    `<img src="${h.url}" title="${h.prompt}" onclick="window.open('${h.url}', '_blank')">`
+  ).join('');
 }
 
-function updateOverlayStyle(){
-  const overlay = document.getElementById('overlayDiv');
-  if(!overlay) return;
-  overlay.style.fontFamily = getActiveFont();
-  overlay.style.fontSize = document.getElementById('textSize').value + 'rem';
-  overlay.classList.remove('engrave-dark', 'engrave-light');
-  overlay.classList.add(document.getElementById('engraveStyle').value);
-}
-
-function escapeHtml(str){
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-
-function downloadCard(){
-  const stage = document.getElementById('cardStage');
-  if(!stage) return;
-
-  const img = stage.querySelector('img');
-  const overlay = stage.querySelector('.overlay-text');
-  const isLightEngrave = overlay.classList.contains('engrave-light');
-
-  const canvas = document.createElement('canvas');
-  const tempImg = new Image();
-  tempImg.crossOrigin = 'anonymous';
-
-  tempImg.onload = function(){
-    canvas.width = tempImg.naturalWidth;
-    canvas.height = tempImg.naturalHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(tempImg, 0, 0);
-
-    const scaleFactor = canvas.width / stage.offsetWidth;
-    const fontSizePx = parseFloat(getComputedStyle(overlay).fontSize) * scaleFactor;
-    const fontFamily = getComputedStyle(overlay).fontFamily;
-    const posYPercent = parseFloat(document.getElementById('posY').value) / 100;
-
-    ctx.font = `${fontSizePx}px ${fontFamily}`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    const text = document.getElementById('overlayText').value.trim() || 'Your Text Here';
-    const maxWidth = canvas.width * 0.8;
-    const lineHeight = fontSizePx * 1.3;
-    const offset = Math.max(1, 1.2 * scaleFactor);
-
-    const baseColor = isLightEngrave ? 'rgba(255,244,220,0.92)' : 'rgba(40,25,15,0.85)';
-    const highlightColor = isLightEngrave ? 'rgba(255,255,255,0.3)' : 'rgba(255,235,200,0.5)';
-    const shadowColor = isLightEngrave ? 'rgba(0,0,0,0.65)' : 'rgba(0,0,0,0.6)';
-
-    // Highlight layer (drawn slightly above, simulates raised light catch)
-    ctx.fillStyle = highlightColor;
-    wrapText(ctx, text, canvas.width / 2, canvas.height * posYPercent - offset, maxWidth, lineHeight);
-
-    // Shadow layer (drawn slightly below, simulates carved depth)
-    ctx.fillStyle = shadowColor;
-    wrapText(ctx, text, canvas.width / 2, canvas.height * posYPercent + offset, maxWidth, lineHeight);
-
-    // Base text layer on top
-    ctx.fillStyle = baseColor;
-    wrapText(ctx, text, canvas.width / 2, canvas.height * posYPercent, maxWidth, lineHeight);
-
-    canvas.toBlob(function(blob){
+function downloadImage(url){
+  fetch(url)
+    .then(res => res.blob())
+    .then(blob => {
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = 'wood-card-' + Date.now() + '.png';
+      link.download = 'pencil-sketch-' + Date.now() + '.png';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    }, 'image/png');
-  };
-
-  tempImg.onerror = function(){
-    setStatus('Could not prepare download (image security restriction). Try taking a screenshot instead.', true);
-  };
-
-  tempImg.src = img.src;
+    })
+    .catch(() => {
+      window.open(url, '_blank');
+    });
 }
 
-function wrapText(ctx, text, x, y, maxWidth, lineHeight){
-  const words = text.split(' ');
-  let lines = [];
-  let currentLine = words[0] || '';
-
-  for(let i = 1; i < words.length; i++){
-    const testLine = currentLine + ' ' + words[i];
-    if(ctx.measureText(testLine).width > maxWidth && currentLine !== ''){
-      lines.push(currentLine);
-      currentLine = words[i];
-    } else {
-      currentLine = testLine;
-    }
+document.getElementById('prompt').addEventListener('keydown', function(e){
+  if(e.key === 'Enter' && e.ctrlKey){
+    generateSketch();
   }
-  lines.push(currentLine);
-
-  const totalHeight = lines.length * lineHeight;
-  let startY = y - totalHeight / 2 + lineHeight / 2;
-
-  lines.forEach(line => {
-    ctx.fillText(line, x, startY);
-    startY += lineHeight;
-  });
-}
+});
 </script>
 
 </body>
